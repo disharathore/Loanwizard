@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
+import { getApiUrl } from '../utils/api'
 
 const STEPS = [
   { key: 'transcript', label: 'Extracting customer data', icon: '🧾', desc: 'Analyzing speech transcript with AI' },
@@ -31,7 +32,7 @@ export default function Analysis({ sessionId, sessionData, onComplete }) {
     setCurrentStep(0)
     setStep('transcript', 'loading')
     try {
-      const { data } = await axios.post('/api/analyze/transcript', { sessionId, transcript, geoLocation })
+      const { data } = await axios.post(getApiUrl('/api/analyze/transcript'), { sessionId, transcript, geoLocation })
       extractedData = data.extractedData
       setStep('transcript', 'done', data.extractedData)
     } catch (e) {
@@ -45,7 +46,7 @@ export default function Analysis({ sessionId, sessionData, onComplete }) {
     setStep('age', 'loading')
     try {
       if (capturedImage) {
-        const { data } = await axios.post('/api/analyze/age', { sessionId, imageBase64: capturedImage })
+        const { data } = await axios.post(getApiUrl('/api/analyze/age'), { sessionId, imageBase64: capturedImage })
         ageData = data.ageData
         setStep('age', 'done', data.ageData)
       } else {
@@ -62,7 +63,7 @@ export default function Analysis({ sessionId, sessionData, onComplete }) {
     setCurrentStep(2)
     setStep('fraud', 'loading')
     try {
-      const { data } = await axios.post('/api/analyze/fraud', {
+      const { data } = await axios.post(getApiUrl('/api/analyze/fraud'), {
         sessionId, extractedData, ageData, geoLocation,
         declaredAge: extractedData?.age || null
       })
@@ -78,7 +79,7 @@ export default function Analysis({ sessionId, sessionData, onComplete }) {
     setCurrentStep(3)
     setStep('offer', 'loading')
     try {
-      const { data } = await axios.post('/api/offer/generate', { sessionId, extractedData, ageData, fraudAnalysis })
+      const { data } = await axios.post(getApiUrl('/api/offer/generate'), { sessionId, extractedData, ageData, fraudAnalysis })
       setStep('offer', 'done', data)
       onComplete({ extractedData, ageData, fraudAnalysis, offerResult: data })
     } catch (e) {

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import axios from 'axios'
+import { getApiUrl } from '../utils/api'
 
 export default function Landing({ onStart, fadeIn = false }) {
   const [loading, setLoading] = useState(false)
@@ -9,7 +10,7 @@ export default function Landing({ onStart, fadeIn = false }) {
     setLoading(true)
     setError('')
     try {
-      const { data } = await axios.post('/api/session/create')
+      const { data } = await axios.post(getApiUrl('/api/session/create'))
       onStart(data.sessionId)
     } catch {
       setError('Could not connect to server. Make sure the backend is running on port 5000.')

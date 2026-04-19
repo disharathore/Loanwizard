@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import axios from 'axios'
+import { getApiUrl } from '../utils/api'
 
 // AI agent questions for the interview
 const INTERVIEW_QUESTIONS = [
@@ -58,7 +59,7 @@ export default function VideoCall({ sessionId, onComplete }) {
         const geo = { latitude: pos.coords.latitude, longitude: pos.coords.longitude, accuracy: pos.coords.accuracy }
         setGeoLocation(geo)
         setGeoStatus('captured')
-        axios.post(`/api/session/${sessionId}/geo`, geo).catch(() => {})
+        axios.post(getApiUrl(`/api/session/${sessionId}/geo`), geo).catch(() => {})
       },
       () => setGeoStatus('denied')
     )
