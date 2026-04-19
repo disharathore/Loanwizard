@@ -7,6 +7,9 @@ export default function Offer({ sessionData, sessionId, onRestart }) {
   const [selectedOffer, setSelectedOffer] = useState(1)
   const [showAudit, setShowAudit] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [applicationSubmitted, setApplicationSubmitted] = useState(false)
+  const [applicationRef, setApplicationRef] = useState('')
 
   if (!offerResult) {
     return (
@@ -89,6 +92,20 @@ export default function Offer({ sessionData, sessionId, onRestart }) {
       setTimeout(() => setCopied(false), 2000)
     } catch {
       setCopied(false)
+    }
+  }
+
+  const handleAcceptOffer = async () => {
+    if (!selected || isSubmitting || applicationSubmitted) return
+
+    setIsSubmitting(true)
+    try {
+      // Demo-safe local confirmation until a dedicated backend endpoint is added.
+      const ref = `${String(activeSessionId).slice(0, 8).toUpperCase()}-${Date.now().toString().slice(-6)}`
+      setApplicationRef(ref)
+      setApplicationSubmitted(true)
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -235,13 +252,30 @@ export default function Offer({ sessionData, sessionId, onRestart }) {
             )}
 
             <div style={{ textAlign: 'center', marginBottom: 20 }}>
-              <button className="btn-primary" style={{ padding: '14px 48px', fontSize: 16 }}>
-                Accept Offer & Apply Now
+              <button
+                className="btn-primary"
+                style={{ padding: '14px 48px', fontSize: 16, opacity: isSubmitting || applicationSubmitted ? 0.85 : 1 }}
+                onClick={handleAcceptOffer}
+                disabled={isSubmitting || applicationSubmitted}
+              >
+                {applicationSubmitted ? 'Application Submitted' : isSubmitting ? 'Submitting...' : 'Accept Offer & Apply Now'}
               </button>
               <div style={{ marginTop: 10, fontSize: 12, color: '#94a3b8' }}>
                 Offer valid for {offer?.validityDays || 7} days · Subject to final verification
               </div>
             </div>
+
+            {applicationSubmitted && (
+              <div style={{ background: '#e8f5ee', border: '1px solid #b8e4cb', borderRadius: 12, padding: '14px 16px', marginBottom: 20 }}>
+                <div style={{ fontWeight: 700, color: '#1a7a4a', marginBottom: 6 }}>✅ Application submitted successfully</div>
+                <div style={{ fontSize: 13, color: '#275d3f' }}>
+                  Reference ID: <strong>{applicationRef}</strong>
+                </div>
+                <div style={{ fontSize: 12, color: '#3a6f52', marginTop: 6 }}>
+                  Our team will contact you shortly for final verification and disbursal.
+                </div>
+              </div>
+            )}
           </>
         ) : (
           <div className="card" style={{ textAlign: 'center', padding: 40, marginBottom: 20 }}>
