@@ -12,6 +12,58 @@ function extractJson(rawText) {
   return JSON.parse(jsonMatch[0]);
 }
 
+function buildFallbackOffer(extractedData = {}, ageData = {}, fraudAnalysis = {}) {
+  const monthlyIncome = Number(extractedData.monthlyIncome || 0);
+  const declaredAge = Number(extractedData.declaredAge || ageData.estimatedAge || 30);
+  const incomeFloor = monthlyIncome > 0 ? monthlyIncome : 30000;
+  const maxEligibleAmount = Math.max(100000, Math.min(1200000, Math.round(incomeFloor * 10)));
+  const recommended = Math.round(maxEligibleAmount * 0.7);
+  const conservative = Math.round(maxEligibleAmount * 0.45);
+  const premium = Math.round(maxEligibleAmount * 0.9);
+  const risk = fraudAnalysis?.overallRisk || "medium";
+  const baseRate = risk === "low" ? 12.5 : 14.5;
+
+  const makeOffer = (type, loanAmount, rate, tenure) => {
+    const r = rate / 12 / 100;
+    const emi = r === 0
+      ? Math.round(loanAmount / tenure)
+      : Math.round((loanAmount * r * Math.pow(1 + r, tenure)) / (Math.pow(1 + r, tenure) - 1));
+    const processingFee = Math.round(loanAmount * 0.02);
+    return {
+      type,
+      loanAmount,
+      interestRate: Number(rate.toFixed(2)),
+      tenure,
+      emiPerMonth: emi,
+      processingFee,
+      totalCost: Math.round(emi * tenure + processingFee),
+      highlight: type === "Recommended" ? "Balanced EMI and approval confidence" : type === "Premium" ? "Higher amount with flexible tenure" : "Lower EMI for safer repayment",
+    };
+  };
+
+  return {
+    eligible: true,
+    offers: [
+      makeOffer("Conservative", conservative, baseRate - 0.5, 24),
+      makeOffer("Recommended", recommended, baseRate, 36),
+      makeOffer("Premium", premium, baseRate + 1.25, 48),
+    ],
+    maxEligibleAmount,
+    creditBand: risk === "low" ? "A" : "B+",
+    nextSteps: [
+      "Confirm KYC details",
+      "Upload income proof",
+      "Complete e-sign to disburse funds",
+    ],
+    conditions: [
+      "Final approval subject to document verification",
+      `Applicant age considered: ${declaredAge}`,
+    ],
+    validityDays: 7,
+    personalizedMessage: `Hi ${extractedData.fullName || "there"}, based on your profile we have prepared a pre-approved offer for quick processing.`,
+  };
+}
+
 async function callGroq(payload) {
   if (!process.env.GROQ_API_KEY) {
     throw new Error("GROQ_API_KEY is not set in backend/.env");
@@ -115,7 +167,13 @@ If not eligible, set eligible to false and offers to [].`;
       max_tokens: 1200,
     });
 
-    const offerData = extractJson(raw);
+    let offerData = extractJson(raw);
+
+    // Demo-safe fallback: if AI returns ineligible for non-high-risk profile,
+    // still provide a conditional pre-approved offer for prototype walkthrough.
+    if (!offerData?.eligible && fraudAnalysis?.overallRisk !== "high") {
+      offerData = buildFallbackOffer(extractedData, ageData, fraudAnalysis);
+    }
 
     // Build audit log
     const auditLog = {
