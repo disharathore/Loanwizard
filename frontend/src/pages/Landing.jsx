@@ -13,7 +13,7 @@ export default function Landing({ onStart, fadeIn = false }) {
       const { data } = await axios.post(getApiUrl('/api/session/create'))
       onStart(data.sessionId)
     } catch {
-      setError('Could not connect to server. Make sure the backend is running on port 5000.')
+      setError('Could not connect to backend. Check VITE_API_BASE on Vercel and backend deployment health.')
       setLoading(false)
     }
   }
