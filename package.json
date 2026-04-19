@@ -1,0 +1,11 @@
+{
+  "name": "loanwizard",
+  "version": "1.0.0",
+  "description": "Agentic AI Video Call Based Loan Onboarding - Poonawalla Fincorp TenzorX",
+  "scripts": {
+    "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "start": "cd backend && node index.js"
+  }
+}

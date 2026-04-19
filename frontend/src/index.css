@@ -1,0 +1,101 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --primary: #1a2e6b;
+  --primary-light: #2a47a8;
+  --accent: #e85d24;
+  --accent-light: #f07240;
+  --success: #1a7a4a;
+  --success-light: #e8f5ee;
+  --warning: #c47a00;
+  --warning-light: #fef3d0;
+  --danger: #c42b2b;
+  --danger-light: #fdeaea;
+  --gray-50: #f8f9fb;
+  --gray-100: #f0f2f5;
+  --gray-200: #e2e6ec;
+  --gray-400: #9aa3b2;
+  --gray-600: #5a6478;
+  --gray-800: #1e2433;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--gray-50);
+  color: var(--gray-800);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+  border: none;
+  outline: none;
+  transition: all 0.2s;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+input, textarea {
+  font-family: inherit;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+  padding: 12px 28px;
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.btn-primary:hover:not(:disabled) { background: var(--primary-light); }
+
+.btn-accent {
+  background: var(--accent);
+  color: #fff;
+  padding: 12px 28px;
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-weight: 600;
+}
+.btn-accent:hover:not(:disabled) { background: var(--accent-light); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--gray-600);
+  padding: 10px 20px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  border: 1.5px solid var(--gray-200);
+}
+.btn-ghost:hover:not(:disabled) { background: var(--gray-100); }
+
+.card {
+  background: #fff;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 24px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.badge-success { background: var(--success-light); color: var(--success); }
+.badge-warning { background: var(--warning-light); color: var(--warning); }
+.badge-danger { background: var(--danger-light); color: var(--danger); }
+.badge-info { background: #e8edf8; color: var(--primary); }
